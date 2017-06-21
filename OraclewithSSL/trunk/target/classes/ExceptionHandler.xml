@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.7.1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+
+	<!-- These exception strategy are given for reference, can be included more 
+		 based on developer's requirement -->
+
+	<choice-exception-strategy name="GlobalExceptionStrategy">
+
+         <catch-exception-strategy
+			 when="#[exception.causedBy(org.springframework.security.authentication.BadCredentialsException)]" doc:name="Http Bad Credential Exception Strategy" doc:description="Http Bad Credential Exception Strategy">
+			 <set-variable value="Authentication failure due to wrong username/password combination" variableName="errorTextValue" doc:name="Error Text Value" doc:description="Customized Error Text Value" />
+			 <set-variable variableName="loggingEntry" value="http-bad-credential-exception" doc:name="logging-entry" doc:description="Logging Entry"/>
+		     <logger message="#[LoggingAppendString]" level="ERROR" doc:name="Error LOG" doc:description="Logging Append String"/>
+		     <set-payload value="Valid Credentials must be provided for accessing this service" doc:name="Set-Payload" doc:description="Credential Failure Message"/>
+		</catch-exception-strategy>
+		
+		<catch-exception-strategy
+			when="#[exception.causedBy(java.net.SocketTimeoutException)]"
+			doc:name="SocketTimeout Exception Strategy">
+			<set-variable variableName="loggingEntry" value="socket-timeout-exception"
+				doc:name="logging-entry" />
+			<logger message="#[LoggingAppendString]" level="ERROR"
+				doc:name="Error LOG" />
+		</catch-exception-strategy>
+
+		<catch-exception-strategy
+			when="#[exception.causedBy(java.net.ConnectException)]"
+			doc:name="Connection Exception Strategy">
+			<set-variable variableName="loggingEntry" value="connect-exception"
+				doc:name="logging-entry" />
+			<logger message="#[LoggingAppendString]" level="ERROR"
+				doc:name="Error LOG" />
+		</catch-exception-strategy>
+
+        <catch-exception-strategy
+			when="#[exception.causedBy(java.io.IOException)]"
+			doc:name="IO Exception Strategy">
+			<set-variable variableName="loggingEntry" value="io-exception"
+				doc:name="logging-entry" />
+			<logger message="#[LoggingAppendString]" level="ERROR"
+				doc:name="Error LOG" />
+		</catch-exception-strategy>
+		
+		<catch-exception-strategy
+			when="#[exception.causedBy(java.lang.NullPointerException)]"
+			doc:name="NullPointerException Strategy">
+			<set-variable variableName="loggingEntry" value="null-pointer-exception"
+				doc:name="logging-entry" />
+			<logger message="#[LoggingAppendString]" level="ERROR"
+				doc:name="Error LOG" />
+		</catch-exception-strategy>
+		
+		<catch-exception-strategy when="#[exception.causedBy(java.lang.Exception)]"
+			doc:name="DefaultException Strategy">
+			<set-variable variableName="loggingEntry" value="default-exception"
+				doc:name="logging-entry" />
+			<logger message="#[LoggingAppendString]" level="ERROR"
+				doc:name="Error LOG" />
+		</catch-exception-strategy>
+		
+	</choice-exception-strategy>
+</mule>

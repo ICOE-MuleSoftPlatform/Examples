@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns="http://www.mulesoft.org/schema/mule/core" 
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:mule-ss="http://www.mulesoft.org/schema/mule/spring-security"
+    xmlns:spring-security="http://www.springframework.org/schema/security"
+	xmlns:secure-property-placeholder="http://www.mulesoft.org/schema/mule/secure-property-placeholder"
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/current/mule-spring-security.xsd
+http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/secure-property-placeholder http://www.mulesoft.org/schema/mule/secure-property-placeholder/current/mule-secure-property-placeholder.xsd">
+
+
+	<!-- Global configuration, developer can include more based on their requirement -->
+	<!-- Mandatory configuration for logging framework -->
+	<spring:beans>
+		<spring:import resource="classpath:logging-config.xml" />
+		<spring:import resource="classpath:healthcheck.xml" />
+
+		<!-- Http Authentication Bean -->
+		<spring-security:authentication-manager
+			id="httpAuthenticationManager">
+			<spring-security:authentication-provider>
+				<spring-security:user-service id="userAuth">
+					<spring-security:user name="${https.user.name}" password="${https.user.pwd}" authorities="ROLE_ADMIN" />
+				</spring-security:user-service>
+			</spring-security:authentication-provider>
+		</spring-security:authentication-manager>
+	</spring:beans>
+
+	<!-- Use this property for configuration and encryption,"key" and "env" 
+		is defined in mule-app.properties If developer is changing the property file 
+		name then the new name should reflect in below configuration because mule 
+		server always looks for the file which is configured below. -->
+	<secure-property-placeholder:config ignoreUnresolvablePlaceholders="true"
+		name="Secure_Property_Placeholder" encryptionAlgorithm="Blowfish" key="${key}"
+		location="properties/oracle-with-ssl-${env}.properties" doc:name="Secure Property Placeholder" />
+
+	<!-- Mule Spring Security Manager -->
+	<mule-ss:security-manager name="muleSecurityManager" doc:name="Spring Security Provider">
+		<mule-ss:delegate-security-provider name="memory-provider" delegate-ref="httpAuthenticationManager" />
+	</mule-ss:security-manager>
+	
+	<!-- Http configuration -->
+    <http:listener-config name="HTTP_Listener_Configuration" host="${https.host}" port="${https.port}" protocol="HTTPS" doc:name="HTTP Listener Configuration">
+        <tls:context>
+            <tls:key-store type="jks" path="server.jks" keyPassword="keypwd" password="storepwd"/>
+        </tls:context>
+    </http:listener-config>
+</mule>

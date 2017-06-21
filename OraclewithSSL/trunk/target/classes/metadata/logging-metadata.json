@@ -1,0 +1,135 @@
+{
+	"comment": [
+		"1. The below logging entries contains dummy data, properties values can be changed based on requirement",
+		"2. Developer only need to add the values for properties, don't change the name of property",
+		"3. All fields are mandatory for logging, for more details please refer logging framework document"
+	],
+	"logging-metadata-entries": [
+		{
+			"entry": {
+				"id": "Main-Flow-Entry-Log",
+				"integrationIdValue": "${integrationIdValue}",
+				"integrationNameValue":"${integrationNameValue}",
+				"statusValue": "success",
+				"executionPointValue": "start of a Main-Flow",
+				"sourceSystemValue": "sourceSytem",
+				"targetSystemValue": "Oracle",
+				"resourceTypeValue": "SQS",
+				"resourceNameValue": "resourceName",
+				"groupIDValue":"",
+				"payloadValue": "payload"
+			}
+		},
+		{
+			"entry": {
+				"id": "Main-Flow-Exit-Log",
+				"integrationIdValue": "${integrationIdValue}",
+				"integrationNameValue":"${integrationNameValue}",
+				"statusValue": "success",
+				"executionPointValue": "end of a Main-Flow",
+				"sourceSystemValue": "SAP",
+				"targetSystemValue": "ISSCOM",
+				"resourceTypeValue": "flow",
+				"resourceNameValue": "Main-Flow",
+				"payloadValue": "payloadAttribute"
+			}
+		},
+		{
+			"entry": {
+				"id": "http-bad-credential-exception",
+				"integrationIdValue": "${integrationIdValue}",
+				"integrationNameValue":"${integrationNameValue}",
+				"statusValue": "error",
+				"executionPointValue": "exception handling",
+				"sourceSystemValue": "SAP",
+				"targetSystemValue": "ISSCOM",
+				"resourceTypeValue": "flow",
+				"resourceNameValue": "flow name where possibility of this exception",
+				"errorCodeValue": "E101",
+				"errorTypeValue": "org.springframework.security.authentication.BadCredentialsException",
+				"errorTextValue":"#[flowVars.errorTextValue]",
+				"payloadValue": "payloadAttribute"
+			}
+		},
+		{
+			"entry": {
+				"id": "socket-timeout-exception",
+				"integrationIdValue": "${integrationIdValue}",
+				"integrationNameValue":"${integrationNameValue}",
+				"statusValue": "error",
+				"executionPointValue": "exception handling",
+				"sourceSystemValue": "SAP",
+				"targetSystemValue": "ISSCOM",
+				"resourceTypeValue": "flow",
+				"resourceNameValue": "flow name where possibility of this exception",
+				"errorCodeValue": "E102",
+				"errorTypeValue": "java.net.SocketTimeoutException",
+				"payloadValue": "payloadAttribute"
+			}
+		},
+		{
+			"entry": {
+				"id": "connect-exception",
+				"integrationIdValue": "${integrationIdValue}",
+				"integrationNameValue":"${integrationNameValue}",
+				"statusValue": "error",
+				"executionPointValue": "exception handling",
+				"sourceSystemValue": "SAP",
+				"targetSystemValue": "ISSCOM",
+				"resourceTypeValue": "flow",
+				"resourceNameValue": "flow name where possibility of this exception",
+				"errorCodeValue": "E103",
+				"errorTypeValue": "java.net.ConnectionException",
+				"payloadValue": "payloadAttribute"
+			}
+		},
+		{
+			"entry": {
+				"id": "io-exception",
+				"integrationIdValue": "${integrationIdValue}",
+				"integrationNameValue":"${integrationNameValue}",
+				"statusValue": "error",
+				"executionPointValue": "exception handling",
+				"sourceSystemValue": "SAP",
+				"targetSystemValue": "ISSCOM",
+				"resourceTypeValue": "flow",
+				"resourceNameValue": "flow name where possibility of this exception",
+				"errorCodeValue": "E104",
+				"errorTypeValue": "java.io.IOException",
+				"payloadValue": "payloadAttribute"
+			}
+		},
+		{
+			"entry": {
+				"id": "null-pointer-exception",
+				"integrationIdValue": "${integrationIdValue}",
+				"integrationNameValue":"${integrationNameValue}",
+				"statusValue": "error",
+				"executionPointValue": "exception handling",
+				"sourceSystemValue": "SAP",
+				"targetSystemValue": "ISSCOM",
+				"resourceTypeValue": "flow",
+				"resourceNameValue": "flow name where possibility of this exception",
+				"errorCodeValue": "E105",
+				"errorTypeValue": "java.lang.NullPointerException",
+				"payloadValue": "payloadAttribute"
+			}
+		},
+		{
+			"entry": {
+				"id": "default-exception",
+				"integrationIdValue": "${integrationIdValue}",
+				"integrationNameValue":"${integrationNameValue}",
+				"statusValue": "error",
+				"executionPointValue": "exception handling",
+				"sourceSystemValue": "SAP",
+				"targetSystemValue": "ISSCOM",
+				"resourceTypeValue": "flow",
+				"resourceNameValue": "flow name where possibility of this exception",
+				"errorCodeValue": "E106",
+				"errorTypeValue": "java.lang.Exception",
+				"payloadValue": "payloadAttribute"
+			}
+		}
+	]
+}

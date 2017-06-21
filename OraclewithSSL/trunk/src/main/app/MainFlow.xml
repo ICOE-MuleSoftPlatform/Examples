@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
+
+<spring:beans>
+		<spring:bean id="dataSource" name="oracleeds" class="oracle.jdbc.pool.OracleDataSource" scope="singleton">
+			<spring:property name="URL" value="${dbURL}"/>
+			<spring:property name="user" value="${dbuser}"/>
+			<spring:property name="password" value="${dbpassword}"/>
+			<spring:property name="ConnectionProperties">
+				<spring:props>
+					<spring:prop key="javax.net.ssl.trustStoreType">${trustStoreType}</spring:prop>
+					<spring:prop key="javax.net.ssl.trustStore">${app.home}/classes/cwallet.sso</spring:prop>
+				</spring:props>
+			</spring:property>
+		</spring:bean>
+	</spring:beans>
+    <db:oracle-config name="Oracle_Configuration-TCPS"  doc:name="Oracle Configuration" dataSource-ref="dataSource">
+    </db:oracle-config> 
+    
+    <flow name="Main-Flow">
+        
+        <!-- Http Connector just to trigger the flow based on the requirement -->
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/oraclwithssl" doc:name="HTTP Connector" doc:description="Http connector to trigger the flow"/>
+        
+        <!-- Http basic security filter to protect the flow from unauthorized access -->
+<!--          <http:basic-security-filter securityProviders="memory-provider" realm="Valid user credentials must be provided" doc:name="Http Basic Security"/> -->
+       
+       <set-variable variableName="loggingEntry" value="Main-Flow-Entry-Log" doc:name="logging-entry"/>
+        
+        <!-- For printing the Start Log on console, "LoggingAppendString" is default value which logging framework is using to 
+             print the logs on console, this value can't be changed.
+         -->
+        <logger message="#[LoggingAppendString]" level="INFO" doc:name="Start LOG"/>
+        
+       <scripting:component doc:name="Set Security Provider (See Notes)" doc:description="This Groovy component is not necessry when you add the following entry to your &lt;JRE_LIB&gt;/security/java.security file above all other SSO providers:
+			security.provider.3=oracle.security.pki.OraclePKIProvider
+			Use the following command line when launching Anypoint Studio in order to test the DB Connection at design time:
+			AnypointStudio.exe -Djava.security.properties==&lt;path_to_your_java_security_file&gt;">
+			
+        <scripting:script engine="Groovy"><![CDATA[
+			import oracle.security.pki.OraclePKIProvider;
+			java.security.Security.insertProviderAt(new OraclePKIProvider(), 3);]]></scripting:script>
+        </scripting:component>
+        
+        <db:select config-ref="Oracle_Configuration-TCPS" doc:name="Oracle DB w/Wallet Security">
+            <db:parameterized-query><![CDATA[select * from dual]]></db:parameterized-query>
+        </db:select>
+        <json:object-to-json-transformer doc:name="Object to JSON"/>
+        
+        <set-variable variableName="loggingEntry" value="Main-Flow-Exit-Log" doc:name="logging-entry"/>
+        
+        <logger message="#[LoggingAppendString]" level="INFO" doc:name="End LOG"/>
+        
+        <!-- Reference to exception handling flows -->
+        <exception-strategy ref="GlobalExceptionStrategy" doc:name="Reference Exception Strategy"/>
+    </flow>
+</mule>

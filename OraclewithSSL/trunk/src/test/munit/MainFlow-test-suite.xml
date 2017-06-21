@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:core="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+    
+<!-- Munit Configuration is mandatory, shouldn't be removed -->    
+    <munit:config name="munit" doc:name="MUnit configuration"/>
+    
+ <!-- 
+     All mule resources should be imported before creating Munit Test Cases.
+     If developer is changing the name of the mule configuration file name then
+     the changes should reflect in below spring bean configuration
+  -->
+    <spring:beans>
+        <spring:import resource="classpath:MainFlow.xml"/>
+        <spring:import resource="classpath:GlobalConfig.xml"/>
+        <spring:import resource="classpath:ExceptionHandler.xml"/>
+    </spring:beans>
+    
+ <!-- 
+      This munit test is for demo purpose, developer should include all the possible test cases for all mule flows. Munit test should cover
+      all mule components,connectors, message processors etc which are available in Mule Flow.
+ -->   
+    <munit:test name="Main-Flow-1-test-suite" description="Test">
+        <munit:set payload="#['Testing Flow-1']" doc:name="Set Message">
+            <munit:inbound-properties>
+              <munit:inbound-property key="authorization" value="${munit.https.auth}"/>
+           </munit:inbound-properties>
+        </munit:set>
+        <flow-ref name="Main-Flow" doc:name="Flow-ref to Main-Flow"/>
+        <munit:assert-not-null message="Payload is Null" doc:name="Assert Not Null Payload"/>
+    </munit:test>
+ 
+</mule>
